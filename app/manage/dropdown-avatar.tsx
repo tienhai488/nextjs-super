@@ -10,6 +10,10 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
+import { useLogoutMutation } from '@/queries/useAuth'
+import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
+import { handleErrorApi } from '@/lib/utils'
 
 const account = {
   name: 'Nguyễn Văn A',
@@ -17,6 +21,20 @@ const account = {
 }
 
 export default function DropdownAvatar() {
+  const logoutMutaion = useLogoutMutation()
+  const router = useRouter()
+
+  const handleLogout = async () => {
+    if (logoutMutaion.isPending) return
+    try {
+      await logoutMutaion.mutateAsync()
+      toast.success('Đăng xuất thành công')
+      router.push('/login')
+    } catch (error) {
+      handleErrorApi({ error })
+    }
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -37,7 +55,7 @@ export default function DropdownAvatar() {
         </DropdownMenuItem>
         <DropdownMenuItem>Hỗ trợ</DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>Đăng xuất</DropdownMenuItem>
+        <DropdownMenuItem onClick={handleLogout}>Đăng xuất</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   )

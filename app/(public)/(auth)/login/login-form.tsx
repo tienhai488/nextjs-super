@@ -28,7 +28,7 @@ export default function LoginForm() {
     try {
       const result = await loginMutation.mutateAsync(data)
       toast.success(result.payload.message)
-      router.push('/')
+      router.push('/manage/dashboard')
     } catch (error) {
       handleErrorApi({
         error,
