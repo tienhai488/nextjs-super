@@ -2,6 +2,7 @@ import authApiRequest from '@/apiRequests/auth'
 import { LoginBodyType } from '@/schemaValidations/auth.schema'
 import { cookies } from 'next/headers'
 import jwt from 'jsonwebtoken'
+import { HttpError } from '@/lib/http'
 
 export async function POST(request: Request) {
   const body = (await request.json()) as LoginBodyType
@@ -32,13 +33,17 @@ export async function POST(request: Request) {
 
     return Response.json(payload)
   } catch (error) {
-    Response.json(
-      {
-        message: 'Login failed'
-      },
-      {
-        status: 500
-      }
-    )
+    if (error instanceof HttpError) {
+      return Response.json(error.payload, { status: error.status })
+    } else {
+      return Response.json(
+        {
+          success: false,
+          message: 'Đã xảy ra lỗi không xác định, vui lòng thử lại sau',
+          payload: null
+        },
+        { status: 500 }
+      )
+    }
   }
 }

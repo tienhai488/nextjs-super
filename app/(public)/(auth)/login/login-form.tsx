@@ -6,8 +6,13 @@ import { useForm } from 'react-hook-form'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Form, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { useLoginMutation } from '@/queries/useAuth'
+import { toast } from 'sonner'
+import { handleErrorApi } from '@/lib/utils'
 
 export default function LoginForm() {
+  const loginMutation = useLoginMutation()
+
   const form = useForm<LoginBodyType>({
     resolver: zodResolver(LoginBody),
     defaultValues: {
@@ -16,15 +21,28 @@ export default function LoginForm() {
     }
   })
 
+  const onSubmit = async (data: LoginBodyType) => {
+    if (loginMutation.isPending) return
+    try {
+      const result = await loginMutation.mutateAsync(data)
+      toast.success(result.payload.message)
+    } catch (error) {
+      handleErrorApi({
+        error,
+        setError: form.setError
+      })
+    }
+  }
+
   return (
-    <Card className='mx-auto max-w-sm'>
+    <Card className='mx-auto w-[400px]'>
       <CardHeader>
         <CardTitle className='text-2xl'>Đăng nhập</CardTitle>
         <CardDescription>Nhập email và mật khẩu của bạn để đăng nhập vào hệ thống</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form className='space-y-2 max-w-[600px] shrink-0 w-full' noValidate>
+          <form className='space-y-2 shrink-0 w-full' noValidate onSubmit={form.handleSubmit(onSubmit)}>
             <div className='grid gap-4'>
               <FormField
                 control={form.control}
