@@ -34,3 +34,15 @@ export const handleErrorApi = ({
     })
   }
 }
+
+const isBrowser = typeof window !== 'undefined'
+
+export const getAccessTokenFromLS = (): string | null => {
+  if (!isBrowser) return null
+  return localStorage.getItem('accessToken')
+}
+
+export const setAccessTokenToLS = (token: string): void => {
+  if (!isBrowser) return
+  localStorage.setItem('accessToken', token)
+}
