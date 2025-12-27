@@ -13,7 +13,7 @@ export function proxy(request: NextRequest) {
   }
 
   if (publicPaths.some((path) => pathname.startsWith(path)) && isAuth) {
-    return NextResponse.redirect(new URL('/', request.url))
+    return NextResponse.redirect(new URL('/manage/dashboard', request.url))
   }
 
   return NextResponse.next()
