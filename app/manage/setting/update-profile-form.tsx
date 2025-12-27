@@ -10,17 +10,22 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
-import { useAccountProfile } from '@/queries/useAccount'
+import { useAccountMe, useUpdateMeMutation } from '@/queries/useAccount'
+import { useUploadMediaMutation } from '@/queries/useMedia'
+import { toast } from 'sonner'
+import { handleErrorApi } from '@/lib/utils'
 
 export default function UpdateProfileForm() {
   const [file, setFile] = useState<File | null>(null)
   const avatarInputRef = useRef<HTMLInputElement>(null)
-  const { data } = useAccountProfile()
+  const { data, refetch } = useAccountMe()
+  const uploadMediaMutation = useUploadMediaMutation()
+  const updateMeMutation = useUpdateMeMutation()
   const form = useForm<UpdateMeBodyType>({
     resolver: zodResolver(UpdateMeBody),
     defaultValues: {
       name: '',
-      avatar: ''
+      avatar: undefined
     }
   })
 
@@ -32,7 +37,7 @@ export default function UpdateProfileForm() {
       const { name, avatar } = data.payload.data
       form.reset({
         name,
-        avatar: avatar || ''
+        avatar: avatar || undefined
       })
     }
   }, [data, form])
@@ -52,9 +57,47 @@ export default function UpdateProfileForm() {
     }
   }
 
+  const onReset = () => {
+    form.reset()
+    setFile(null)
+  }
+
+  const onSubmit = async (body: UpdateMeBodyType) => {
+    if (updateMeMutation.isPending) return
+
+    try {
+      if (file) {
+        const formData = new FormData()
+        formData.append('file', file)
+
+        const uploadRes = await uploadMediaMutation.mutateAsync(formData)
+
+        body.avatar = uploadRes.payload.data
+      }
+
+      if (!body.avatar) {
+        delete body.avatar
+      }
+
+      const res = await updateMeMutation.mutateAsync(body)
+      toast.success(res.payload.message)
+      refetch()
+    } catch (error) {
+      handleErrorApi({
+        error,
+        setError: form.setError
+      })
+    }
+  }
+
   return (
     <Form {...form}>
-      <form noValidate className='grid auto-rows-max items-start gap-4 md:gap-8'>
+      <form
+        noValidate
+        className='grid auto-rows-max items-start gap-4 md:gap-8'
+        onReset={onReset}
+        onSubmit={form.handleSubmit(onSubmit, (e) => console.log('errors:', e))}
+      >
         <Card x-chunk='dashboard-07-chunk-0'>
           <CardHeader>
             <CardTitle>Thông tin cá nhân</CardTitle>
