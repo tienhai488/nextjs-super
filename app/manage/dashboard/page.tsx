@@ -1,5 +1,20 @@
-import React from 'react'
+import accountApiRequest from '@/apiRequests/account'
+import { cookies } from 'next/headers'
 
-export default function DashboardPage() {
-  return <div>DashboardPage</div>
+export default async function DashboardPage() {
+  const cookieStore = await cookies()
+  const accessToken = cookieStore.get('accessToken')?.value as string
+
+  let name = ''
+
+  try {
+    const result = await accountApiRequest.sMe(accessToken)
+    name = result.payload.data.name
+  } catch (error: any) {
+    if (error.digest?.includes('NEXT_REDIRECT')) {
+      throw error
+    }
+  }
+
+  return <div>Dashboard: {name}</div>
 }
