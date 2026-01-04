@@ -3,33 +3,44 @@
 import { getAccessTokenFromLS, getRefreshTokenFromLocalStorage } from '@/lib/utils'
 import { useLogoutMutation } from '@/queries/useAuth'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useEffect, useRef } from 'react'
+import { Suspense, useEffect, useRef } from 'react'
 
-export default function LogoutPage() {
+function LogoutHandler() {
   const { mutateAsync } = useLogoutMutation()
   const router = useRouter()
   const searchParams = useSearchParams()
+
   const refreshTokenFromUrl = searchParams.get('refreshToken') || undefined
   const accessTokenFromUrl = searchParams.get('accessToken') || undefined
-  const ref = useRef<any>(null)
+  const ref = useRef<Promise<any> | null>(null)
 
   useEffect(() => {
-    if (
-      ref.current &&
-      ((refreshTokenFromUrl && refreshTokenFromUrl !== getRefreshTokenFromLocalStorage()) ||
-        (accessTokenFromUrl && accessTokenFromUrl !== getAccessTokenFromLS()))
-    ) {
-      ref.current = mutateAsync().then((res) => {
-        setTimeout(() => {
-          ref.current = null
-        }, 1000)
+    const shouldCallLogout =
+      (refreshTokenFromUrl && refreshTokenFromUrl !== getRefreshTokenFromLocalStorage()) ||
+      (accessTokenFromUrl && accessTokenFromUrl !== getAccessTokenFromLS())
 
-        router.push('/login')
-      })
-    } else {
-      router.push('/login')
+    if (!ref.current && shouldCallLogout) {
+      ref.current = mutateAsync()
+        .catch(() => {
+          // ignore
+        })
+        .finally(() => {
+          ref.current = null
+          router.push('/login')
+        })
+      return
     }
+
+    router.push('/login')
   }, [mutateAsync, router, refreshTokenFromUrl, accessTokenFromUrl])
 
-  return <div>Logout...</div>
+  return <div>Logging out...</div>
+}
+
+export default function LogoutPage() {
+  return (
+    <Suspense fallback={<div>Logging out...</div>}>
+      <LogoutHandler />
+    </Suspense>
+  )
 }
