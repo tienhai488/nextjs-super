@@ -1,9 +1,7 @@
 'use client'
 
-import { getAccessTokenFromLS } from '@/lib/utils'
+import { useAppContext } from '@/components/app-provider'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import { set } from 'zod'
 
 const menuItems = [
   {
@@ -28,16 +26,7 @@ const menuItems = [
 ]
 
 export default function NavItems({ className }: { className?: string }) {
-  const [isAuth, setIsAuth] = useState<boolean>(false)
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setIsAuth(Boolean(getAccessTokenFromLS()))
-    setMounted(true)
-  }, [])
-
-  if (!mounted) return null
+  const { isAuth } = useAppContext()
 
   return menuItems.map((item) => {
     if (item.authRequired === undefined || item.authRequired === isAuth) {

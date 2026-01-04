@@ -9,11 +9,22 @@ import { Input } from '@/components/ui/input'
 import { useLoginMutation } from '@/queries/useAuth'
 import { toast } from 'sonner'
 import { handleErrorApi } from '@/lib/utils'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useAppContext } from '@/components/app-provider'
+import { useEffect } from 'react'
 
 export default function LoginForm() {
   const loginMutation = useLoginMutation()
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const clearTokens = searchParams.get('clearTokens')
+  const { setIsAuth } = useAppContext()
+
+  useEffect(() => {
+    if (clearTokens === 'true') {
+      setIsAuth(false)
+    }
+  }, [clearTokens, setIsAuth])
 
   const form = useForm<LoginBodyType>({
     resolver: zodResolver(LoginBody),

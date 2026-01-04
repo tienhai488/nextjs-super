@@ -17,6 +17,8 @@ export default function RefreshTokenPage() {
           router.push(redirectPathname || '/')
         }
       })
+    } else {
+      router.push('/login')
     }
   }, [redirectPathname, refreshTokenFromUrl, router])
 
