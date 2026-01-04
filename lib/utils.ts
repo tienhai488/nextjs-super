@@ -59,6 +59,12 @@ export const setRefreshTokenToLocalStorage = (token: string): void => {
   localStorage.setItem('refreshToken', token)
 }
 
+export const removeTokensFromLocalStorage = (): void => {
+  if (!isBrowser) return
+  localStorage.removeItem('accessToken')
+  localStorage.removeItem('refreshToken')
+}
+
 export const checkAndRefreshToken = async (params?: { onSuccess?: () => void; onError?: () => void }) => {
   const accessToken = getAccessTokenFromLS()
   const refreshToken = getRefreshTokenFromLocalStorage()
@@ -73,6 +79,10 @@ export const checkAndRefreshToken = async (params?: { onSuccess?: () => void; on
   const now = Math.round(new Date().getTime() / 1000)
 
   if (decodeRefreshToken.exp <= now) {
+    removeTokensFromLocalStorage()
+    if (params?.onError) {
+      params.onError()
+    }
     return
   }
 
@@ -86,6 +96,7 @@ export const checkAndRefreshToken = async (params?: { onSuccess?: () => void; on
         params.onSuccess()
       }
     } catch (error) {
+      removeTokensFromLocalStorage()
       if (params?.onError) {
         params.onError()
       }

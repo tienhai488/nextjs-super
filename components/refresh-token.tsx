@@ -1,12 +1,13 @@
 'use client'
 
 import { checkAndRefreshToken } from '@/lib/utils'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 
 const UNAUTHENTICATED_PATHS = ['/login', '/register', '/refresh-token']
 export default function RefreshToken() {
   const pathname = usePathname()
+  const router = useRouter()
 
   useEffect(() => {
     if (UNAUTHENTICATED_PATHS.includes(pathname)) {
@@ -15,20 +16,31 @@ export default function RefreshToken() {
 
     let interval: any = null
 
+    const onTokenError = () => {
+      clearInterval(interval)
+      window.location.href = '/login'
+      // router.push('/login')
+    }
+
     checkAndRefreshToken({
-      onError: () => {
-        clearInterval(interval)
-      }
+      onError: onTokenError
     })
 
-    interval = setInterval(checkAndRefreshToken, 1000)
+    // Check every 1 second
+    interval = setInterval(
+      () =>
+        checkAndRefreshToken({
+          onError: onTokenError
+        }),
+      1000
+    )
 
     return () => {
       if (interval) {
         clearInterval(interval)
       }
     }
-  }, [pathname])
+  }, [pathname, router])
 
   return null
 }
