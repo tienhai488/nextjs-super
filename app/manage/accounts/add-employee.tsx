@@ -14,14 +14,22 @@ import { Label } from '@/components/ui/label'
 import { CreateEmployeeAccountBody, CreateEmployeeAccountBodyType } from '@/schemaValidations/account.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PlusCircle, Upload } from 'lucide-react'
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { useCreateAccountMutation } from '@/queries/useAccount'
+import { useUploadMediaMutation } from '@/queries/useMedia'
+import { toast } from 'sonner'
+import { handleErrorApi } from '@/lib/utils'
 
 export default function AddEmployee() {
   const [file, setFile] = useState<File | null>(null)
   const [open, setOpen] = useState(false)
+
+  const createAccountMutation = useCreateAccountMutation()
+  const uploadMediaMutation = useUploadMediaMutation()
+
   const avatarInputRef = useRef<HTMLInputElement | null>(null)
   const form = useForm<CreateEmployeeAccountBodyType>({
     resolver: zodResolver(CreateEmployeeAccountBody),
@@ -35,12 +43,45 @@ export default function AddEmployee() {
   })
   const avatar = form.watch('avatar')
   const name = form.watch('name')
-  const previewAvatarFromFile = useMemo(() => {
+
+  const [previewAvatarFromFile, setPreviewAvatarFromFile] = useState<string | undefined>(undefined)
+  useEffect(() => {
     if (file) {
-      return URL.createObjectURL(file)
+      const objectUrl = URL.createObjectURL(file)
+      setPreviewAvatarFromFile(objectUrl)
+
+      return () => URL.revokeObjectURL(objectUrl)
+    } else {
+      setPreviewAvatarFromFile(avatar)
     }
-    return avatar
   }, [file, avatar])
+
+  const onReset = () => {
+    form.reset()
+    setFile(null)
+  }
+
+  const onSubmit = async (body: CreateEmployeeAccountBodyType) => {
+    if (createAccountMutation.isPending) return
+    try {
+      if (file) {
+        const formData = new FormData()
+        formData.append('file', file)
+        const mediaResponse = await uploadMediaMutation.mutateAsync(formData)
+        body.avatar = mediaResponse.payload.data
+      }
+
+      await createAccountMutation.mutateAsync(body)
+      toast.success('Tạo tài khoản thành công')
+      setOpen(false)
+      onReset()
+    } catch (error) {
+      handleErrorApi({
+        error,
+        setError: form.setError
+      })
+    }
+  }
 
   return (
     <Dialog onOpenChange={setOpen} open={open}>
@@ -56,7 +97,13 @@ export default function AddEmployee() {
           <DialogDescription>Các trường tên, email, mật khẩu là bắt buộc</DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form noValidate className='grid auto-rows-max items-start gap-4 md:gap-8' id='add-employee-form'>
+          <form
+            noValidate
+            className='grid auto-rows-max items-start gap-4 md:gap-8'
+            id='add-employee-form'
+            onSubmit={form.handleSubmit(onSubmit)}
+            onReset={onReset}
+          >
             <div className='grid gap-4 py-4'>
               <FormField
                 control={form.control}
