@@ -8,13 +8,18 @@ import { PlusCircle } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
-import { getVietnameseTableStatus } from '@/lib/utils'
+import { getVietnameseTableStatus, handleErrorApi } from '@/lib/utils'
 import { CreateTableBody, CreateTableBodyType } from '@/schemaValidations/table.schema'
 import { TableStatus, TableStatusValues } from '@/constants/type'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { useCreateTableMutation } from '@/queries/useTable'
+import { toast } from 'sonner'
 
 export default function AddTable() {
   const [open, setOpen] = useState(false)
+
+  const createTableMutation = useCreateTableMutation()
+
   const form = useForm<CreateTableBodyType>({
     resolver: zodResolver(CreateTableBody),
     defaultValues: {
@@ -23,8 +28,36 @@ export default function AddTable() {
       status: TableStatus.Hidden
     }
   })
+
+  const onReset = () => {
+    form.reset()
+  }
+
+  const onSubmit = async (data: CreateTableBodyType) => {
+    if (createTableMutation.isPending) return
+
+    try {
+      const res = await createTableMutation.mutateAsync(data)
+      toast.success(res.payload.message)
+      setOpen(false)
+      onReset()
+    } catch (error) {
+      handleErrorApi({
+        error
+      })
+    }
+  }
+
   return (
-    <Dialog onOpenChange={setOpen} open={open}>
+    <Dialog
+      onOpenChange={(value) => {
+        setOpen(value)
+        if (!value) {
+          onReset()
+        }
+      }}
+      open={open}
+    >
       <DialogTrigger asChild>
         <Button size='sm' className='h-7 gap-1'>
           <PlusCircle className='h-3.5 w-3.5' />
@@ -36,7 +69,13 @@ export default function AddTable() {
           <DialogTitle>Thêm bàn</DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form noValidate className='grid auto-rows-max items-start gap-4 md:gap-8' id='add-table-form'>
+          <form
+            noValidate
+            className='grid auto-rows-max items-start gap-4 md:gap-8'
+            id='add-table-form'
+            onSubmit={form.handleSubmit(onSubmit)}
+            onReset={onReset}
+          >
             <div className='grid gap-4 py-4'>
               <FormField
                 control={form.control}
