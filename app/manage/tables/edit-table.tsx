@@ -6,12 +6,15 @@ import { Label } from '@/components/ui/label'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
-import { getTableLink, getVietnameseTableStatus } from '@/lib/utils'
+import { getTableLink, getVietnameseTableStatus, handleErrorApi } from '@/lib/utils'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { UpdateTableBody, UpdateTableBodyType } from '@/schemaValidations/table.schema'
 import { TableStatus, TableStatusValues } from '@/constants/type'
 import { Switch } from '@/components/ui/switch'
 import Link from 'next/link'
+import { useGetTable, useUpdateTableMutation } from '@/queries/useTable'
+import { useEffect } from 'react'
+import { toast } from 'sonner'
 
 export default function EditTable({
   id,
@@ -22,6 +25,11 @@ export default function EditTable({
   setId: (value: number | undefined) => void
   onSubmitSuccess?: () => void
 }) {
+  const updateTableMutation = useUpdateTableMutation(id as number)
+  const { data } = useGetTable({
+    id: id as number,
+    enabled: Boolean(id)
+  })
   const form = useForm<UpdateTableBodyType>({
     resolver: zodResolver(UpdateTableBody),
     defaultValues: {
@@ -30,13 +38,44 @@ export default function EditTable({
       changeToken: false
     }
   })
-  const tableNumber = 0
+  const tableNumber = data?.payload.data.number || 0
+
+  useEffect(() => {
+    if (data) {
+      const { capacity, status } = data.payload.data
+      form.reset({
+        capacity,
+        status,
+        changeToken: false
+      })
+    }
+  }, [form, data])
+
+  const onReset = () => {
+    form.reset()
+  }
+
+  const onSubmit = async (data: UpdateTableBodyType) => {
+    if (updateTableMutation.isPending) return
+
+    try {
+      const res = await updateTableMutation.mutateAsync(data)
+      onSubmitSuccess?.()
+      setId(undefined)
+      toast.success(res.payload.message)
+    } catch (error) {
+      handleErrorApi({
+        error
+      })
+    }
+  }
 
   return (
     <Dialog
       open={Boolean(id)}
       onOpenChange={(value) => {
         if (!value) {
+          onReset()
           setId(undefined)
         }
       }}
@@ -52,7 +91,13 @@ export default function EditTable({
           <DialogTitle>Cập nhật bàn ăn</DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form noValidate className='grid auto-rows-max items-start gap-4 md:gap-8' id='edit-table-form'>
+          <form
+            noValidate
+            className='grid auto-rows-max items-start gap-4 md:gap-8'
+            id='edit-table-form'
+            onSubmit={form.handleSubmit(onSubmit)}
+            onReset={onReset}
+          >
             <div className='grid gap-4 py-4'>
               <FormItem>
                 <div className='grid grid-cols-4 items-center justify-items-start gap-4'>
@@ -86,7 +131,7 @@ export default function EditTable({
                     <div className='grid grid-cols-4 items-center justify-items-start gap-4'>
                       <Label htmlFor='description'>Trạng thái</Label>
                       <div className='col-span-3 w-full space-y-2'>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder='Chọn trạng thái' />
