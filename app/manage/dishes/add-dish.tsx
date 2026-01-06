@@ -4,42 +4,89 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogT
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { PlusCircle, Upload } from 'lucide-react'
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { getVietnameseDishStatus } from '@/lib/utils'
+import { getVietnameseDishStatus, handleErrorApi } from '@/lib/utils'
 import { CreateDishBody, CreateDishBodyType } from '@/schemaValidations/dish.schema'
 import { DishStatus, DishStatusValues } from '@/constants/type'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useCreateDishMutation } from '@/queries/useDish'
+import { useUploadMediaMutation } from '@/queries/useMedia'
+import { toast } from 'sonner'
 
 export default function AddDish() {
   const [file, setFile] = useState<File | null>(null)
   const [open, setOpen] = useState(false)
   const imageInputRef = useRef<HTMLInputElement | null>(null)
+
+  const createDishMutation = useCreateDishMutation()
+  const uploadMediaMutation = useUploadMediaMutation()
+
   const form = useForm<CreateDishBodyType>({
     resolver: zodResolver(CreateDishBody),
     defaultValues: {
       name: '',
       description: '',
       price: 0,
-      image: '',
+      image: undefined,
       status: DishStatus.Unavailable
     }
   })
   const image = form.watch('image')
   const name = form.watch('name')
-  const previewAvatarFromFile = useMemo(() => {
+  const [previewAvatarFromFile, setPreviewAvatarFromFile] = useState<string | undefined>(undefined)
+  useEffect(() => {
     if (file) {
-      return URL.createObjectURL(file)
+      const objectUrl = URL.createObjectURL(file)
+      setPreviewAvatarFromFile(objectUrl)
+
+      return () => URL.revokeObjectURL(objectUrl)
+    } else {
+      setPreviewAvatarFromFile(image)
     }
-    return image
   }, [file, image])
 
+  const onReset = () => {
+    form.reset()
+    setFile(null)
+  }
+
+  const onSubmit = async (body: CreateDishBodyType) => {
+    if (createDishMutation.isPending) return
+
+    try {
+      if (file) {
+        const formData = new FormData()
+        formData.append('file', file)
+        const uploadRes = await uploadMediaMutation.mutateAsync(formData)
+        body.image = uploadRes.payload.data
+      }
+      const res = await createDishMutation.mutateAsync(body)
+      toast.success(res.payload.message)
+      setOpen(false)
+      onReset()
+    } catch (error) {
+      handleErrorApi({
+        error,
+        setError: form.setError
+      })
+    }
+  }
+
   return (
-    <Dialog onOpenChange={setOpen} open={open}>
+    <Dialog
+      onOpenChange={(value) => {
+        setOpen(value)
+        if (value) {
+          onReset()
+        }
+      }}
+      open={open}
+    >
       <DialogTrigger asChild>
         <Button size='sm' className='h-7 gap-1'>
           <PlusCircle className='h-3.5 w-3.5' />
@@ -51,7 +98,13 @@ export default function AddDish() {
           <DialogTitle>Thêm món ăn</DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form noValidate className='grid auto-rows-max items-start gap-4 md:gap-8' id='add-dish-form'>
+          <form
+            noValidate
+            className='grid auto-rows-max items-start gap-4 md:gap-8'
+            id='add-dish-form'
+            onSubmit={form.handleSubmit(onSubmit)}
+            onReset={onReset}
+          >
             <div className='grid gap-4 py-4'>
               <FormField
                 control={form.control}
@@ -85,6 +138,7 @@ export default function AddDish() {
                         <span className='sr-only'>Upload</span>
                       </button>
                     </div>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
