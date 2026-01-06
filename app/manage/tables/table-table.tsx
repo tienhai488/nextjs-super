@@ -42,6 +42,7 @@ import AutoPagination from '@/components/auto-pagination'
 import { TableListResType } from '@/schemaValidations/table.schema'
 import EditTable from '@/app/manage/tables/edit-table'
 import AddTable from '@/app/manage/tables/add-table'
+import { useGetTableList } from '@/queries/useTable'
 
 type TableItem = TableListResType['data'][0]
 
@@ -151,7 +152,8 @@ export default function TableTable() {
   // const params = Object.fromEntries(searchParam.entries())
   const [tableIdEdit, setTableIdEdit] = useState<number | undefined>()
   const [tableDelete, setTableDelete] = useState<TableItem | null>(null)
-  const data: any[] = []
+  const tableListQuery = useGetTableList()
+  const data: any[] = tableListQuery.data?.payload.data || []
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
