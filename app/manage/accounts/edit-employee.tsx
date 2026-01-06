@@ -13,7 +13,7 @@ import { Label } from '@/components/ui/label'
 import { UpdateEmployeeAccountBody, UpdateEmployeeAccountBodyType } from '@/schemaValidations/account.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Upload } from 'lucide-react'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -51,13 +51,17 @@ export default function EditEmployee({
   const avatar = form.watch('avatar')
   const name = form.watch('name')
   const changePassword = form.watch('changePassword')
-  const previewAvatarFromFile = useMemo(() => {
+  const [previewAvatarFromFile, setPreviewAvatarFromFile] = useState<string | undefined>(undefined)
+  useEffect(() => {
     if (file) {
-      return URL.createObjectURL(file)
-    }
-    return avatar
-  }, [file, avatar])
+      const objectUrl = URL.createObjectURL(file)
+      setPreviewAvatarFromFile(objectUrl)
 
+      return () => URL.revokeObjectURL(objectUrl)
+    } else {
+      setPreviewAvatarFromFile(avatar)
+    }
+  }, [file, avatar])
   useEffect(() => {
     if (data) {
       const { name, email, avatar } = data.payload.data
