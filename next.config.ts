@@ -1,7 +1,18 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
-  /* config options here */
-};
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '4000',
+        pathname: '/static/**'
+      }
+    ],
+    qualities: [25, 50, 75, 100],
+    unoptimized: process.env.ENVIRONMENT === 'development'
+  }
+}
 
-export default nextConfig;
+export default nextConfig
