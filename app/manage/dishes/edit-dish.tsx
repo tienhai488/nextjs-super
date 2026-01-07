@@ -194,7 +194,13 @@ export default function EditDish({
                     <div className='grid grid-cols-4 items-center justify-items-start gap-4'>
                       <Label htmlFor='price'>Giá</Label>
                       <div className='col-span-3 w-full space-y-2'>
-                        <Input id='price' className='w-full' {...field} type='number' />
+                        <Input
+                          id='price'
+                          className='w-full'
+                          {...field}
+                          type='number'
+                          onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                        />
                         <FormMessage />
                       </div>
                     </div>

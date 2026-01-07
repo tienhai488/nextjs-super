@@ -85,7 +85,13 @@ export default function AddTable() {
                     <div className='grid grid-cols-4 items-center justify-items-start gap-4'>
                       <Label htmlFor='name'>Số hiệu bàn</Label>
                       <div className='col-span-3 w-full space-y-2'>
-                        <Input id='number' type='number' className='w-full' {...field} />
+                        <Input
+                          id='number'
+                          type='number'
+                          className='w-full'
+                          {...field}
+                          onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                        />
                         <FormMessage />
                       </div>
                     </div>
@@ -100,7 +106,13 @@ export default function AddTable() {
                     <div className='grid grid-cols-4 items-center justify-items-start gap-4'>
                       <Label htmlFor='price'>Lượng khách cho phép</Label>
                       <div className='col-span-3 w-full space-y-2'>
-                        <Input id='capacity' className='w-full' {...field} type='number' />
+                        <Input
+                          id='capacity'
+                          className='w-full'
+                          {...field}
+                          type='number'
+                          onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                        />
                         <FormMessage />
                       </div>
                     </div>
