@@ -24,6 +24,8 @@ import { Textarea } from '@/components/ui/textarea'
 import { useUploadMediaMutation } from '@/queries/useMedia'
 import { useGetDish, useUpdateDishMutation } from '@/queries/useDish'
 import { toast } from 'sonner'
+import revalidateApiRequest from '@/apiRequests/revalidate'
+import { useRouter } from 'next/navigation'
 
 export default function EditDish({
   id,
@@ -36,6 +38,7 @@ export default function EditDish({
 }) {
   const [file, setFile] = useState<File | null>(null)
   const imageInputRef = useRef<HTMLInputElement | null>(null)
+  const router = useRouter()
 
   const uploadMediaMutation = useUploadMediaMutation()
   const updateDishMutation = useUpdateDishMutation(id as number)
@@ -100,6 +103,8 @@ export default function EditDish({
         body.image = uploadRes.payload.data
       }
       const res = await updateDishMutation.mutateAsync(body)
+      await revalidateApiRequest('dishes')
+      router.refresh()
       toast.success(res.payload.message)
       onReset()
       onSubmitSuccess?.()

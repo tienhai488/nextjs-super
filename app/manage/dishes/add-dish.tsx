@@ -17,11 +17,14 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useCreateDishMutation } from '@/queries/useDish'
 import { useUploadMediaMutation } from '@/queries/useMedia'
 import { toast } from 'sonner'
+import revalidateApiRequest from '@/apiRequests/revalidate'
+import { useRouter } from 'next/navigation'
 
 export default function AddDish() {
   const [file, setFile] = useState<File | null>(null)
   const [open, setOpen] = useState(false)
   const imageInputRef = useRef<HTMLInputElement | null>(null)
+  const router = useRouter()
 
   const createDishMutation = useCreateDishMutation()
   const uploadMediaMutation = useUploadMediaMutation()
@@ -66,6 +69,8 @@ export default function AddDish() {
         body.image = uploadRes.payload.data
       }
       const res = await createDishMutation.mutateAsync(body)
+      await revalidateApiRequest('dishes')
+      router.refresh()
       toast.success(res.payload.message)
       setOpen(false)
       onReset()

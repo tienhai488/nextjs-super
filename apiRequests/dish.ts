@@ -2,7 +2,7 @@ import http from '@/lib/http'
 import { CreateDishBodyType, DishListResType, DishResType, UpdateDishBodyType } from '@/schemaValidations/dish.schema'
 
 const dishApiRequest = {
-  list: () => http.get<DishListResType>('/dishes'),
+  list: () => http.get<DishListResType>('/dishes', { next: { tags: ['dishes'] } }),
   detail: (id: number) => http.get<DishResType>(`/dishes/${id}`),
   create: (body: CreateDishBodyType) => http.post<DishResType>('/dishes', body),
   update: (id: number, body: UpdateDishBodyType) => http.put<DishResType>(`/dishes/${id}`, body),
