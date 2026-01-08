@@ -39,6 +39,7 @@ export default function EditTable({
     }
   })
   const tableNumber = data?.payload.data.number || 0
+  const tableToken = data?.payload.data.token || ''
 
   useEffect(() => {
     if (data) {
@@ -182,14 +183,14 @@ export default function EditTable({
                   <div className='col-span-3 w-full space-y-2'>
                     <Link
                       href={getTableLink({
-                        token: '123123123',
+                        token: tableToken,
                         tableNumber: tableNumber
                       })}
                       target='_blank'
                       className='break-all'
                     >
                       {getTableLink({
-                        token: '123123123',
+                        token: tableToken,
                         tableNumber: tableNumber
                       })}
                     </Link>

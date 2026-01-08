@@ -15,18 +15,21 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { handleErrorApi } from '@/lib/utils'
 import { useAccountMe } from '@/queries/useAccount'
+import { useAppContext } from '@/components/app-provider'
 
 export default function DropdownAvatar() {
   const logoutMutaion = useLogoutMutation()
   const router = useRouter()
   const { data } = useAccountMe()
   const account = data?.payload.data
+  const { setRole } = useAppContext()
 
   const handleLogout = async () => {
     if (logoutMutaion.isPending) return
     try {
       await logoutMutaion.mutateAsync()
       toast.success('Đăng xuất thành công')
+      setRole(undefined)
       router.push('/login')
     } catch (error) {
       handleErrorApi({ error })

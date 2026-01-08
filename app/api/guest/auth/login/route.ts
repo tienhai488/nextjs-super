@@ -1,15 +1,15 @@
-import authApiRequest from '@/apiRequests/auth'
 import { cookies } from 'next/headers'
 import jwt from 'jsonwebtoken'
 import { HttpError } from '@/lib/http'
 import { GuestLoginBodyType } from '@/schemaValidations/guest.schema'
+import guestApiRequest from '@/apiRequests/guest'
 
 export async function POST(request: Request) {
   const body = (await request.json()) as GuestLoginBodyType
   const cookieStore = await cookies()
 
   try {
-    const { payload } = await authApiRequest.sLogin(body)
+    const { payload } = await guestApiRequest.sLogin(body)
     const { accessToken, refreshToken } = payload.data
 
     const decodeAccessToken = jwt.decode(accessToken) as { exp: number }

@@ -1,5 +1,5 @@
 import authApiRequest from '@/apiRequests/auth'
-import { EntityError } from '@/lib/http'
+import { EntityError, HttpError } from '@/lib/http'
 import { clsx, type ClassValue } from 'clsx'
 import { UseFormSetError } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -7,6 +7,7 @@ import { twMerge } from 'tailwind-merge'
 import jwt from 'jsonwebtoken'
 import { DishStatus, TableStatus } from '@/constants/type'
 import envConfig from '@/config'
+import { TokenPayload } from '@/types/jwt.types'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -33,7 +34,9 @@ export const handleErrorApi = ({
       })
     })
   } else {
-    toast.error(error?.message || 'Đã có lỗi xảy ra', {
+    const backendMessage = error instanceof HttpError ? error.payload?.message : error?.payload?.message
+
+    toast.error(backendMessage || error?.message || 'Đã có lỗi xảy ra', {
       duration: duration || 5000
     })
   }
@@ -75,8 +78,8 @@ export const checkAndRefreshToken = async (params?: { onSuccess?: () => void; on
     return
   }
 
-  const decodeAccessToken = jwt.decode(accessToken) as { exp: number; iat: number }
-  const decodeRefreshToken = jwt.decode(refreshToken) as { exp: number; iat: number }
+  const decodeAccessToken = decodeToken(accessToken)
+  const decodeRefreshToken = decodeToken(refreshToken)
 
   const now = Math.round(new Date().getTime() / 1000)
 
@@ -137,4 +140,8 @@ export const getVietnameseTableStatus = (status: (typeof TableStatus)[keyof type
 
 export const getTableLink = ({ token, tableNumber }: { token: string; tableNumber: number }) => {
   return envConfig.NEXT_PUBLIC_URL + '/tables/' + tableNumber + '?token=' + token
+}
+
+export const decodeToken = (token: string) => {
+  return jwt.decode(token) as TokenPayload
 }
