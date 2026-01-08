@@ -1,8 +1,12 @@
+import { Role } from '@/constants/type'
+import { decodeToken } from '@/lib/utils'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-const privatePaths = ['/manage']
-const publicPaths = ['/login']
+const managePaths = ['/manage']
+const guestPath = ['/guest']
+const privatePaths = [...managePaths, ...guestPath]
+const unauthPaths = ['/login']
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
@@ -15,15 +19,26 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  if (privatePaths.some((path) => pathname.startsWith(path)) && refreshToken && !accessToken) {
-    const url = new URL('/refresh-token', request.url)
-    url.searchParams.set('refreshToken', refreshToken)
-    url.searchParams.set('redirect', pathname)
-    return NextResponse.redirect(url)
-  }
+  if (refreshToken) {
+    if (unauthPaths.some((path) => pathname.startsWith(path))) {
+      return NextResponse.redirect(new URL('/', request.url))
+    }
 
-  if (publicPaths.some((path) => pathname.startsWith(path)) && refreshToken) {
-    return NextResponse.redirect(new URL('/', request.url))
+    if (privatePaths.some((path) => pathname.startsWith(path)) && !accessToken) {
+      const url = new URL('/guest/auth/refresh-token', request.url)
+      url.searchParams.set('redirect', pathname)
+      return NextResponse.redirect(url)
+    }
+
+    const role = decodeToken(accessToken!).role
+
+    if (managePaths.some((path) => pathname.startsWith(path)) && role !== Role.Owner) {
+      return NextResponse.redirect(new URL('/', request.url))
+    }
+
+    if (guestPath.some((path) => pathname.startsWith(path)) && role !== Role.Guest) {
+      return NextResponse.redirect(new URL('/', request.url))
+    }
   }
 
   return NextResponse.next()
@@ -33,5 +48,5 @@ export function proxy(request: NextRequest) {
 // export default function proxy(request: NextRequest) { ... }
 
 export const config = {
-  matcher: ['/manage/:path*', '/login']
+  matcher: ['/manage/:path*', '/guest/:path*', '/login']
 }
