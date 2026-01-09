@@ -8,6 +8,10 @@ const nextConfig: NextConfig = {
         hostname: 'localhost',
         port: '4000',
         pathname: '/static/**'
+      },
+      {
+        hostname: 'via.placeholder.com',
+        pathname: '/**'
       }
     ],
     qualities: [25, 50, 75, 100],
