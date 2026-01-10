@@ -1,9 +1,12 @@
 'use client'
 
 import { Badge } from '@/components/ui/badge'
+import socket from '@/lib/socket'
 import { formatCurrency, getVietnameseOrderStatus } from '@/lib/utils'
 import { useGuestOrderListQuery } from '@/queries/useGuest'
+import { UpdateOrderResType } from '@/schemaValidations/order.schema'
 import Image from 'next/image'
+import { useEffect } from 'react'
 
 export default function OrdersCart() {
   const guestOrderListQuery = useGuestOrderListQuery()
@@ -12,6 +15,35 @@ export default function OrdersCart() {
   const totalPrice = orders.reduce((total, order) => {
     return total + order.dishSnapshot.price * order.quantity
   }, 0)
+
+  useEffect(() => {
+    if (socket.connected) {
+      onConnect()
+    }
+
+    function onConnect() {
+      console.log('Socket connected with id:', socket.id)
+    }
+
+    function onDisconnect() {
+      console.log('Socket disconnected')
+    }
+
+    function onUpdateOrder(data: UpdateOrderResType['data']) {
+      guestOrderListQuery.refetch()
+    }
+
+    socket.on('update-order', onUpdateOrder)
+
+    socket.on('connect', onConnect)
+    socket.on('disconnect', onDisconnect)
+
+    return () => {
+      socket.off('connect', onConnect)
+      socket.off('disconnect', onDisconnect)
+      socket.off('update-order', onUpdateOrder)
+    }
+  }, [guestOrderListQuery])
 
   return (
     <>

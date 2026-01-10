@@ -1,3 +1,4 @@
+import envConfig from '@/config'
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
@@ -15,7 +16,7 @@ const nextConfig: NextConfig = {
       }
     ],
     qualities: [25, 50, 75, 100],
-    unoptimized: process.env.ENVIRONMENT === 'development'
+    unoptimized: envConfig.ENVIRONMENT === 'development'
   }
 }
 

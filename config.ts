@@ -1,20 +1,22 @@
-import z from "zod";
+import z from 'zod'
 
 const configSchema = z.object({
-    NEXT_PUBLIC_API_ENDPOINT: z.string(),
-    NEXT_PUBLIC_URL: z.string()
-});
+  NEXT_PUBLIC_API_ENDPOINT: z.string(),
+  NEXT_PUBLIC_URL: z.string(),
+  ENVIRONMENT: z.string().optional()
+})
 
 const configProject = configSchema.safeParse({
-    NEXT_PUBLIC_API_ENDPOINT: process.env.NEXT_PUBLIC_API_ENDPOINT,
-    NEXT_PUBLIC_URL: process.env.NEXT_PUBLIC_URL
+  NEXT_PUBLIC_API_ENDPOINT: process.env.NEXT_PUBLIC_API_ENDPOINT,
+  NEXT_PUBLIC_URL: process.env.NEXT_PUBLIC_URL,
+  ENVIRONMENT: process.env.ENVIRONMENT
 })
 
 if (!configProject.success) {
-    console.error("Invalid environment variables:", configProject.error.format());
-    throw new Error("Invalid environment variables");
+  console.error('Invalid environment variables:', configProject.error.format())
+  throw new Error('Invalid environment variables')
 }
 
-const envConfig = configProject.data;
+const envConfig = configProject.data
 
-export default envConfig;
+export default envConfig
