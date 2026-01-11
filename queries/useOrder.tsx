@@ -23,3 +23,9 @@ export const useGetOrderDetailQuery = ({ id, enabled }: { id: number; enabled: b
     enabled
   })
 }
+
+export const usePayGuestOrdersMutation = () => {
+  return useMutation({
+    mutationFn: orderApiRequest.pay
+  })
+}

@@ -6,19 +6,48 @@ import {
   formatCurrency,
   formatDateTimeToLocaleString,
   formatDateTimeToTimeString,
-  getVietnameseOrderStatus
+  getVietnameseOrderStatus,
+  handleErrorApi
 } from '@/lib/utils'
-import { GetOrdersResType } from '@/schemaValidations/order.schema'
+import { usePayGuestOrdersMutation } from '@/queries/useOrder'
+import { GetOrdersResType, PayGuestOrdersResType } from '@/schemaValidations/order.schema'
 import Image from 'next/image'
 import { Fragment } from 'react'
 
 type Guest = GetOrdersResType['data'][0]['guest']
 type Orders = GetOrdersResType['data']
-export default function OrderGuestDetail({ guest, orders }: { guest: Guest; orders: Orders }) {
+export default function OrderGuestDetail({
+  guest,
+  orders,
+  onPaySuccess
+}: {
+  guest: Guest
+  orders: Orders
+  onPaySuccess?: (data: PayGuestOrdersResType) => void
+}) {
   const ordersFilterToPurchase = guest
     ? orders.filter((order) => order.status !== OrderStatus.Paid && order.status !== OrderStatus.Rejected)
     : []
   const purchasedOrderFilter = guest ? orders.filter((order) => order.status === OrderStatus.Paid) : []
+  const payGuestOrderMutation = usePayGuestOrdersMutation()
+
+  const onPay = async () => {
+    if (payGuestOrderMutation.isPending) return
+
+    try {
+      const res = await payGuestOrderMutation.mutateAsync({
+        guestId: guest!.id
+      })
+      if (onPaySuccess) {
+        onPaySuccess(res.payload)
+      }
+    } catch (error) {
+      handleErrorApi({
+        error
+      })
+    }
+  }
+
   return (
     <div className='space-y-2 text-sm'>
       {guest && (
@@ -115,7 +144,13 @@ export default function OrderGuestDetail({ guest, orders }: { guest: Guest; orde
       </div>
 
       <div>
-        <Button className='w-full' size={'sm'} variant={'secondary'} disabled={ordersFilterToPurchase.length === 0}>
+        <Button
+          className='w-full'
+          size={'sm'}
+          variant={'secondary'}
+          disabled={ordersFilterToPurchase.length === 0}
+          onClick={onPay}
+        >
           Thanh toán tất cả ({ordersFilterToPurchase.length} đơn)
         </Button>
       </div>
