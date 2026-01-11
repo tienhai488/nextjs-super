@@ -152,6 +152,8 @@ export const getVietnameseOrderStatus = (status: (typeof OrderStatus)[keyof type
       return 'Đã giao'
     case OrderStatus.Rejected:
       return 'Đã từ chối'
+    case OrderStatus.Paid:
+      return 'Đã thanh toán'
     default:
       return 'Không xác định'
   }
