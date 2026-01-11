@@ -151,7 +151,7 @@ export default function AddOrder() {
                 'pointer-events-none': dish.status === DishStatus.Unavailable
               })}
             >
-              <div className='flex-shrink-0 relative'>
+              <div className='shrink-0 relative'>
                 {dish.status === DishStatus.Unavailable && (
                   <span className='absolute inset-0 flex items-center justify-center text-sm'>Hết hàng</span>
                 )}
@@ -169,7 +169,7 @@ export default function AddOrder() {
                 <p className='text-xs'>{dish.description}</p>
                 <p className='text-xs font-semibold'>{formatCurrency(dish.price)}</p>
               </div>
-              <div className='flex-shrink-0 ml-auto flex justify-center items-center'>
+              <div className='shrink-0 ml-auto flex justify-center items-center'>
                 <Quantity
                   onChange={(value) => handleQuantityChange(dish.id, value)}
                   value={orders.find((order) => order.dishId === dish.id)?.quantity ?? 0}

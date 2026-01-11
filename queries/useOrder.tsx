@@ -9,6 +9,12 @@ export const useOrderListQuery = (queryParams: GetOrdersQueryParamsType) => {
   })
 }
 
+export const useCreateOrderMutation = () => {
+  return useMutation({
+    mutationFn: orderApiRequest.create
+  })
+}
+
 export const useUpdateOrderMutation = () => {
   return useMutation({
     mutationFn: ({ orderId, body }: { orderId: number; body: UpdateOrderBodyType }) =>

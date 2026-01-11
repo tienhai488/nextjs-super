@@ -1,5 +1,7 @@
 import http from '@/lib/http'
 import {
+  CreateOrdersBodyType,
+  CreateOrdersResType,
   GetOrderDetailResType,
   GetOrdersQueryParamsType,
   GetOrdersResType,
@@ -19,6 +21,7 @@ const orderApiRequest = {
           toDate: queryParams.toDate?.toISOString()
         })
     ),
+  create: (body: CreateOrdersBodyType) => http.post<CreateOrdersResType>('/orders', body),
   update: (orderId: number, body: UpdateOrderBodyType) => http.put<UpdateOrderResType>(`/orders/${orderId}`, body),
   getOrderDetail: (orderId: number) => http.get<GetOrderDetailResType>(`/orders/${orderId}`),
   pay: (body: PayGuestOrdersBodyType) => http.post<PayGuestOrdersResType>('/orders/pay', body)
