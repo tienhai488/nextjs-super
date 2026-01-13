@@ -16,16 +16,25 @@ import GuestsDialog from '@/app/manage/orders/guests-dialog'
 import { CreateOrdersBodyType } from '@/schemaValidations/order.schema'
 import Quantity from '@/app/guest/menu/quantity'
 import Image from 'next/image'
-import { cn, formatCurrency } from '@/lib/utils'
+import { cn, formatCurrency, handleErrorApi } from '@/lib/utils'
 import { DishStatus } from '@/constants/type'
 import { DishListResType } from '@/schemaValidations/dish.schema'
+import { useGetDishList } from '@/queries/useDish'
+import { useCreateOrderMutation } from '@/queries/useOrder'
+import { useCreateGuestMutation } from '@/queries/useAccount'
+import { toast } from 'sonner'
 
 export default function AddOrder() {
   const [open, setOpen] = useState(false)
   const [selectedGuest, setSelectedGuest] = useState<GetListGuestsResType['data'][0] | null>(null)
   const [isNewGuest, setIsNewGuest] = useState(true)
   const [orders, setOrders] = useState<CreateOrdersBodyType['orders']>([])
-  const dishes: DishListResType['data'] = []
+  const dishListQuery = useGetDishList()
+  const dishes: DishListResType['data'] = useMemo(() => {
+    return dishListQuery.data?.payload.data || []
+  }, [dishListQuery.data])
+  const createOrderMutation = useCreateOrderMutation()
+  const createGuestMutation = useCreateGuestMutation()
 
   const totalPrice = useMemo(() => {
     return dishes.reduce((result, dish) => {
@@ -60,10 +69,54 @@ export default function AddOrder() {
     })
   }
 
-  const handleOrder = async () => {}
+  const handleOrder = async () => {
+    try {
+      let guestId = selectedGuest?.id
+
+      if (isNewGuest) {
+        const createGuestRes = await createGuestMutation.mutateAsync({
+          name,
+          tableNumber
+        })
+        guestId = createGuestRes.payload.data.id
+      }
+
+      if (!guestId) {
+        toast.error('Vui lòng chọn khách hàng')
+        return
+      }
+
+      await createOrderMutation.mutateAsync({
+        guestId,
+        orders
+      })
+
+      onReset()
+    } catch (error) {
+      handleErrorApi({
+        error,
+        setError: form.setError
+      })
+    }
+  }
+
+  const onReset = () => {
+    form.reset()
+    setSelectedGuest(null)
+    setIsNewGuest(true)
+    setOrders([])
+    setOpen(false)
+  }
 
   return (
-    <Dialog onOpenChange={setOpen} open={open}>
+    <Dialog
+      onOpenChange={(value) => {
+        if (!value) {
+          onReset()
+        }
+        setOpen(value)
+      }}
+    >
       <DialogTrigger asChild>
         <Button size='sm' className='h-7 gap-1'>
           <PlusCircle className='h-3.5 w-3.5' />
