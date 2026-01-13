@@ -5,13 +5,15 @@ import { Bar, BarChart, XAxis, YAxis } from 'recharts'
 
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
+import { DashboardIndicatorResType } from '@/schemaValidations/indicator.schema'
+import { useMemo } from 'react'
 
 const colors = [
-  'var(--color-chrome)',
-  'var(--color-safari)',
-  'var(--color-firefox)',
-  'var(--color-edge)',
-  'var(--color-other)'
+  'var(--color-chart-1)',
+  'var(--color-chart-2)',
+  'var(--color-chart-3)',
+  'var(--color-chart-4)',
+  'var(--color-chart-5)'
 ]
 
 const chartConfig = {
@@ -20,33 +22,38 @@ const chartConfig = {
   },
   chrome: {
     label: 'Chrome',
-    color: 'hsl(var(--chart-1))'
+    color: 'var(--color-chart-1)'
   },
   safari: {
     label: 'Safari',
-    color: 'hsl(var(--chart-2))'
+    color: 'var(--color-chart-2)'
   },
   firefox: {
     label: 'Firefox',
-    color: 'hsl(var(--chart-3))'
+    color: 'var(--color-chart-3)'
   },
   edge: {
     label: 'Edge',
-    color: 'hsl(var(--chart-4))'
+    color: 'var(--color-chart-4)'
   },
   other: {
     label: 'Other',
-    color: 'hsl(var(--chart-5))'
+    color: 'var(--color-chart-5)'
   }
 } satisfies ChartConfig
-const chartData = [
-  { name: 'chrome', successOrders: 275, fill: 'var(--color-chrome)' },
-  { name: 'safari', successOrders: 200, fill: 'var(--color-safari)' },
-  { name: 'firefox', successOrders: 187, fill: 'var(--color-firefox)' },
-  { name: 'edge', successOrders: 173, fill: 'var(--color-edge)' },
-  { name: 'other', successOrders: 90, fill: 'var(--color-other)' }
-]
-export function DishBarChart() {
+
+export function DishBarChart({ chartData }: { chartData: DashboardIndicatorResType['data']['dishIndicator'] }) {
+  const chartDateColors = useMemo(
+    () =>
+      chartData.map((data, index) => {
+        return {
+          ...data,
+          fill: colors[index % colors.length]
+        }
+      }),
+    [chartData]
+  )
+
   return (
     <Card>
       <CardHeader>
@@ -57,7 +64,7 @@ export function DishBarChart() {
         <ChartContainer config={chartConfig}>
           <BarChart
             accessibilityLayer
-            data={chartData}
+            data={chartDateColors}
             layout='vertical'
             margin={{
               left: 0
@@ -77,7 +84,7 @@ export function DishBarChart() {
             />
             <XAxis dataKey='successOrders' type='number' hide />
             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-            <Bar dataKey='successOrders' name={'Đơn thanh toán'} layout='vertical' radius={5} />
+            <Bar dataKey='successOrders' name={'Đơn thanh toán : '} layout='vertical' radius={5} />
           </BarChart>
         </ChartContainer>
       </CardContent>
