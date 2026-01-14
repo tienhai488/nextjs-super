@@ -26,7 +26,6 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { AccountListResType, AccountType } from '@/schemaValidations/account.schema'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { createContext, useContext, useEffect, useState } from 'react'
 import {
@@ -46,6 +45,7 @@ import AddEmployee from '@/app/manage/accounts/add-employee'
 import { useDeleteAccountMutation, useGetAccountList } from '@/queries/useAccount'
 import { handleErrorApi } from '@/lib/utils'
 import { toast } from 'sonner'
+import { AccountListResType, AccountType } from '@/schemaValidations/account.schema'
 
 type AccountItem = AccountListResType['data'][0]
 
@@ -94,6 +94,11 @@ export const columns: ColumnDef<AccountType>[] = [
       )
     },
     cell: ({ row }) => <div className='lowercase'>{row.getValue('email')}</div>
+  },
+  {
+    accessorKey: 'role',
+    header: 'Role',
+    cell: ({ row }) => <div className='capitalize'>{row.getValue('role')}</div>
   },
   {
     id: 'actions',

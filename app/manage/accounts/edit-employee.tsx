@@ -10,18 +10,20 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { UpdateEmployeeAccountBody, UpdateEmployeeAccountBodyType } from '@/schemaValidations/account.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Upload } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form'
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Switch } from '@/components/ui/switch'
 import { useGetAccount, useUpdateAccountMutation } from '@/queries/useAccount'
 import { useUploadMediaMutation } from '@/queries/useMedia'
 import { handleErrorApi } from '@/lib/utils'
 import { toast } from 'sonner'
+import { Role, RoleValues } from '@/constants/type'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { UpdateEmployeeAccountBody, UpdateEmployeeAccountBodyType } from '@/schemaValidations/account.schema'
 
 export default function EditEmployee({
   id,
@@ -45,7 +47,8 @@ export default function EditEmployee({
       avatar: undefined,
       password: undefined,
       confirmPassword: undefined,
-      changePassword: false
+      changePassword: false,
+      role: Role.Employee
     }
   })
   const avatar = form.watch('avatar')
@@ -64,7 +67,7 @@ export default function EditEmployee({
   }, [file, avatar])
   useEffect(() => {
     if (data) {
-      const { name, email, avatar } = data.payload.data
+      const { name, email, avatar, role } = data.payload.data
 
       form.reset({
         name,
@@ -72,7 +75,8 @@ export default function EditEmployee({
         email,
         changePassword: form.getValues('changePassword'),
         password: form.getValues('password'),
-        confirmPassword: form.getValues('confirmPassword')
+        confirmPassword: form.getValues('confirmPassword'),
+        role
       })
     }
   }, [data, form])
@@ -188,6 +192,37 @@ export default function EditEmployee({
                       <Label htmlFor='email'>Email</Label>
                       <div className='col-span-3 w-full space-y-2'>
                         <Input id='email' className='w-full' {...field} />
+                        <FormMessage />
+                      </div>
+                    </div>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name='role'
+                render={({ field }) => (
+                  <FormItem>
+                    <div className='grid grid-cols-4 items-center justify-items-start gap-4'>
+                      <Label htmlFor='role'>Trạng thái</Label>
+                      <div className='col-span-3 w-full space-y-2'>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder='Chọn vai trò' />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {RoleValues.map((role) => {
+                              if (role === Role.Guest) return null
+                              return (
+                                <SelectItem key={role} value={role}>
+                                  {role}
+                                </SelectItem>
+                              )
+                            })}
+                          </SelectContent>
+                        </Select>
                         <FormMessage />
                       </div>
                     </div>
