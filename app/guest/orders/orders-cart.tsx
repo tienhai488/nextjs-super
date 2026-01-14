@@ -1,8 +1,8 @@
 'use client'
 
+import { useAppContext } from '@/components/app-provider'
 import { Badge } from '@/components/ui/badge'
 import { OrderStatus } from '@/constants/type'
-import socket from '@/lib/socket'
 import { formatCurrency, getVietnameseOrderStatus } from '@/lib/utils'
 import { useGuestOrderListQuery } from '@/queries/useGuest'
 import { PayGuestOrdersResType, UpdateOrderResType } from '@/schemaValidations/order.schema'
@@ -13,6 +13,7 @@ import { toast } from 'sonner'
 export default function OrdersCart() {
   const guestOrderListQuery = useGuestOrderListQuery()
   const orders = guestOrderListQuery.data?.payload.data || []
+  const { socket } = useAppContext()
 
   const { waitingForPayment, paid } = orders.reduce(
     (result, order) => {
@@ -55,12 +56,12 @@ export default function OrdersCart() {
   )
 
   useEffect(() => {
-    if (socket.connected) {
+    if (socket?.connected) {
       onConnect()
     }
 
     function onConnect() {
-      console.log('Socket connected with id:', socket.id)
+      console.log('Socket connected with id:', socket?.id)
     }
 
     function onDisconnect() {
@@ -86,18 +87,18 @@ export default function OrdersCart() {
       guestOrderListQuery.refetch()
     }
 
-    socket.on('update-order', onUpdateOrder)
-    socket.on('payment', onPayment)
-    socket.on('connect', onConnect)
-    socket.on('disconnect', onDisconnect)
+    socket?.on('update-order', onUpdateOrder)
+    socket?.on('payment', onPayment)
+    socket?.on('connect', onConnect)
+    socket?.on('disconnect', onDisconnect)
 
     return () => {
-      socket.off('connect', onConnect)
-      socket.off('disconnect', onDisconnect)
-      socket.off('update-order', onUpdateOrder)
-      socket.off('payment', onPayment)
+      socket?.off('connect', onConnect)
+      socket?.off('disconnect', onDisconnect)
+      socket?.off('update-order', onUpdateOrder)
+      socket?.off('payment', onPayment)
     }
-  }, [guestOrderListQuery])
+  }, [guestOrderListQuery, socket])
 
   return (
     <>

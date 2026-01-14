@@ -10,7 +10,7 @@ function LogoutHandler() {
   const { mutateAsync } = useLogoutMutation()
   const router = useRouter()
   const searchParams = useSearchParams()
-  const { setRole } = useAppContext()
+  const { setRole, disconnectSocket } = useAppContext()
 
   const refreshTokenFromUrl = searchParams.get('refreshToken') || undefined
   const accessTokenFromUrl = searchParams.get('accessToken') || undefined
@@ -29,12 +29,13 @@ function LogoutHandler() {
           ref.current = null
         }, 1000)
         setRole(undefined)
+        disconnectSocket()
         router.push('/login')
       })
     } else {
       router.push('/')
     }
-  }, [mutateAsync, router, refreshTokenFromUrl, accessTokenFromUrl, setRole])
+  }, [mutateAsync, router, refreshTokenFromUrl, accessTokenFromUrl, setRole, disconnectSocket])
 
   return <div>Logging out...</div>
 }

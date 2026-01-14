@@ -22,7 +22,7 @@ export default function DropdownAvatar() {
   const router = useRouter()
   const { data } = useAccountMe()
   const account = data?.payload.data
-  const { setRole } = useAppContext()
+  const { setRole, disconnectSocket } = useAppContext()
 
   const handleLogout = async () => {
     if (logoutMutaion.isPending) return
@@ -30,6 +30,7 @@ export default function DropdownAvatar() {
       await logoutMutaion.mutateAsync()
       toast.success('Đăng xuất thành công')
       setRole(undefined)
+      disconnectSocket()
       router.push('/login')
     } catch (error) {
       handleErrorApi({ error })

@@ -8,7 +8,7 @@ import { Form, FormField, FormItem, FormLabel, FormMessage } from '@/components/
 import { Input } from '@/components/ui/input'
 import { useLoginMutation } from '@/queries/useAuth'
 import { toast } from 'sonner'
-import { handleErrorApi } from '@/lib/utils'
+import { generateSocketInstance, handleErrorApi } from '@/lib/utils'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useAppContext } from '@/components/app-provider'
 import { useEffect } from 'react'
@@ -18,7 +18,7 @@ export default function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const clearTokens = searchParams.get('clearTokens')
-  const { setRole } = useAppContext()
+  const { setRole, setSocket } = useAppContext()
 
   useEffect(() => {
     if (clearTokens === 'true') {
@@ -40,6 +40,7 @@ export default function LoginForm() {
       const result = await loginMutation.mutateAsync(data)
       toast.success(result.payload.message)
       setRole(result.payload.data.account.role)
+      setSocket(generateSocketInstance(result.payload.data.accessToken))
       router.push('/manage/dashboard')
     } catch (error) {
       handleErrorApi({
