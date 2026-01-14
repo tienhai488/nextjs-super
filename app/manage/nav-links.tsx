@@ -1,5 +1,6 @@
 'use client'
 import menuItems from '@/app/manage/menuItems'
+import { useAppContext } from '@/components/app-provider'
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
 import { Package2, Settings } from 'lucide-react'
@@ -8,6 +9,7 @@ import { usePathname } from 'next/navigation'
 
 export default function NavLinks() {
   const pathname = usePathname()
+  const { role } = useAppContext()
 
   return (
     <TooltipProvider>
@@ -22,6 +24,8 @@ export default function NavLinks() {
           </Link>
 
           {menuItems.map((Item, index) => {
+            if (!Item.roles.includes(role as any)) return null
+
             const isActive = pathname === Item.href
             return (
               <Tooltip key={index}>

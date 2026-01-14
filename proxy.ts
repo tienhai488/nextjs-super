@@ -7,6 +7,7 @@ const managePaths = ['/manage']
 const guestPath = ['/guest']
 const privatePaths = [...managePaths, ...guestPath]
 const unauthPaths = ['/login']
+const onlyOwnerPaths: string[] = ['/manage/accounts']
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
@@ -32,7 +33,14 @@ export function proxy(request: NextRequest) {
 
     const role = decodeToken(accessToken!).role
 
-    if (managePaths.some((path) => pathname.startsWith(path)) && role !== Role.Owner) {
+    console.log('role', role)
+    console.log('path', pathname)
+
+    if (onlyOwnerPaths.some((path) => pathname.startsWith(path)) && role !== Role.Owner) {
+      return NextResponse.redirect(new URL('/', request.url))
+    }
+
+    if (managePaths.some((path) => pathname.startsWith(path)) && role === Role.Guest) {
       return NextResponse.redirect(new URL('/', request.url))
     }
 
