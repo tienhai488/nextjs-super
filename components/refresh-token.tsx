@@ -1,5 +1,6 @@
 'use client'
 
+import socket from '@/lib/socket'
 import { checkAndRefreshToken } from '@/lib/utils'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect } from 'react'
@@ -35,10 +36,36 @@ export default function RefreshToken() {
       1000
     )
 
+    if (socket.connected) {
+      onConnect()
+    }
+
+    function onConnect() {
+      console.log(socket.id)
+    }
+
+    function onDisconnect() {
+      console.log('disconnect')
+    }
+
+    function onRefreshTokenSocket() {
+      checkAndRefreshToken({
+        onError: onTokenError,
+        isForce: true
+      })
+    }
+
+    socket.on('connect', onConnect)
+    socket.on('disconnect', onDisconnect)
+    socket.on('refresh-token', onRefreshTokenSocket)
+
     return () => {
       if (interval) {
         clearInterval(interval)
       }
+      socket.off('connect', onConnect)
+      socket.off('disconnect', onDisconnect)
+      socket.off('refresh-token', onRefreshTokenSocket)
     }
   }, [pathname, router])
 
