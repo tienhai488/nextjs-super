@@ -30,10 +30,6 @@ const menuItems: {
     href: '/'
   },
   {
-    title: 'Setting',
-    href: '/setting'
-  },
-  {
     title: 'Menu',
     href: '/guest/menu',
     roles: [Role.Guest]

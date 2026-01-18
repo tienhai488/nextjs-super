@@ -1,4 +1,5 @@
 import dishApiRequest from '@/apiRequests/dish'
+import Modal from '@/app/(public)/@modal/(.)dishes/[id]/modal'
 import DishDetail from '@/app/(public)/dishes/[id]/dish-detail'
 import { wrapServerApi } from '@/lib/utils'
 import { DishResType } from '@/schemaValidations/dish.schema'
@@ -10,5 +11,9 @@ export default async function DishPage({ params }: { params: { id: string } }) {
 
   const dish = data?.payload.data
 
-  return <DishDetail dish={dish as DishResType['data']} />
+  return (
+    <Modal>
+      <DishDetail dish={dish as DishResType['data']} />
+    </Modal>
+  )
 }
