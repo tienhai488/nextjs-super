@@ -7,14 +7,16 @@ import { useForm } from 'react-hook-form'
 import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { GuestLoginBody, GuestLoginBodyType } from '@/schemaValidations/guest.schema'
-import { useAppContext } from '@/components/app-provider'
+import { useAppStore } from '@/components/app-provider'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { useGuestLoginMutation } from '@/queries/useGuest'
 import { useEffect } from 'react'
 import { generateSocketInstance, handleErrorApi } from '@/lib/utils'
 
 export default function GuestLoginForm() {
-  const { setRole, setSocket } = useAppContext()
+  // const { setRole, setSocket } = useAppContext()
+  const setRole = useAppStore((state) => state.setRole)
+  const setSocket = useAppStore((state) => state.setSocket)
   const searchParams = useSearchParams()
   const params = useParams()
   const tableNumber = Number(params.number)

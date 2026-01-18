@@ -1,6 +1,6 @@
 'use client'
 
-import { useAppContext } from '@/components/app-provider'
+import { useAppStore } from '@/components/app-provider'
 import { getAccessTokenFromLS, getRefreshTokenFromLocalStorage } from '@/lib/utils'
 import { useLogoutMutation } from '@/queries/useAuth'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -10,8 +10,9 @@ function LogoutHandler() {
   const { mutateAsync } = useLogoutMutation()
   const router = useRouter()
   const searchParams = useSearchParams()
-  const { setRole, disconnectSocket } = useAppContext()
-
+  // const { setRole, disconnectSocket } = useAppContext()
+  const setRole = useAppStore((state) => state.setRole)
+  const disconnectSocket = useAppStore((state) => state.disconnectSocket)
   const refreshTokenFromUrl = searchParams.get('refreshToken') || undefined
   const accessTokenFromUrl = searchParams.get('accessToken') || undefined
   const ref = useRef<boolean | null>(null)

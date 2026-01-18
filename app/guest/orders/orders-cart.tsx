@@ -1,6 +1,6 @@
 'use client'
 
-import { useAppContext } from '@/components/app-provider'
+import { useAppStore } from '@/components/app-provider'
 import { Badge } from '@/components/ui/badge'
 import { OrderStatus } from '@/constants/type'
 import { formatCurrency, getVietnameseOrderStatus } from '@/lib/utils'
@@ -13,7 +13,8 @@ import { toast } from 'sonner'
 export default function OrdersCart() {
   const guestOrderListQuery = useGuestOrderListQuery()
   const orders = guestOrderListQuery.data?.payload.data || []
-  const { socket } = useAppContext()
+  // const { socket } = useAppContext()
+  const socket = useAppStore((state) => state.socket)
 
   const { waitingForPayment, paid } = orders.reduce(
     (result, order) => {

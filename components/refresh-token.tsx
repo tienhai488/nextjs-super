@@ -1,6 +1,6 @@
 'use client'
 
-import { useAppContext } from '@/components/app-provider'
+import { useAppStore } from '@/components/app-provider'
 import { checkAndRefreshToken } from '@/lib/utils'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect } from 'react'
@@ -9,7 +9,9 @@ const UNAUTHENTICATED_PATHS = ['/login', '/register', '/refresh-token']
 export default function RefreshToken() {
   const pathname = usePathname()
   const router = useRouter()
-  const { socket, disconnectSocket } = useAppContext()
+  // const { socket, disconnectSocket } = useAppContext()
+  const socket = useAppStore((state) => state.socket)
+  const disconnectSocket = useAppStore((state) => state.disconnectSocket)
 
   useEffect(() => {
     if (UNAUTHENTICATED_PATHS.includes(pathname)) {

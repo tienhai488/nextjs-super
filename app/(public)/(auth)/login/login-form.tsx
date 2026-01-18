@@ -10,15 +10,17 @@ import { useLoginMutation } from '@/queries/useAuth'
 import { toast } from 'sonner'
 import { generateSocketInstance, handleErrorApi } from '@/lib/utils'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useAppContext } from '@/components/app-provider'
 import { useEffect } from 'react'
+import { useAppStore } from '@/components/app-provider'
 
 export default function LoginForm() {
   const loginMutation = useLoginMutation()
   const router = useRouter()
   const searchParams = useSearchParams()
   const clearTokens = searchParams.get('clearTokens')
-  const { setRole, setSocket } = useAppContext()
+  // const { setRole, setSocket } = useAppContext()
+  const setRole = useAppStore((state) => state.setRole)
+  const setSocket = useAppStore((state) => state.setSocket)
 
   useEffect(() => {
     if (clearTokens === 'true') {

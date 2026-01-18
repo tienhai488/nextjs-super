@@ -35,7 +35,7 @@ import { useOrderListQuery, useUpdateOrderMutation } from '@/queries/useOrder'
 import TableSkeleton from '@/app/manage/orders/table-skeleton'
 import { toast } from 'sonner'
 import { GuestCreateOrdersResType } from '@/schemaValidations/guest.schema'
-import { useAppContext } from '@/components/app-provider'
+import { useAppContext, useAppStore } from '@/components/app-provider'
 
 export const OrderTableContext = createContext({
   setOrderIdEdit: (value: number | undefined) => {},
@@ -84,7 +84,7 @@ export default function OrderTable() {
     pageIndex, // Gía trị mặc định ban đầu, không có ý nghĩa khi data được fetch bất đồng bộ
     pageSize: PAGE_SIZE //default page size
   })
-  const { socket } = useAppContext()
+  const socket = useAppStore((state) => state.socket)
 
   const updateOrderMutation = useUpdateOrderMutation()
 
