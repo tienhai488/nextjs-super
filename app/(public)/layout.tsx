@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import NavItems from '@/app/(public)/nav-items'
 import DarkModeToggle from '@/components/dark-mode-toggle'
+import { DialogDescription, DialogTitle } from '@/components/ui/dialog'
 
 export default function Layout({
   children,
@@ -30,6 +31,10 @@ export default function Layout({
             </Button>
           </SheetTrigger>
           <SheetContent side='left'>
+            <DialogTitle className='sr-only'>Menu</DialogTitle>
+
+            <DialogDescription className='sr-only'>Menu content</DialogDescription>
+
             <nav className='grid gap-6 text-lg font-medium'>
               <Link href='#' className='flex items-center gap-2 text-lg font-semibold'>
                 <Package2 className='h-6 w-6' />

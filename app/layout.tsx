@@ -5,6 +5,7 @@ import { Toaster } from 'sonner'
 import { ThemeProvider } from '@/components/theme-provider'
 import AppProvider from '@/components/app-provider'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { NextIntlClientProvider } from 'next-intl'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -29,13 +30,15 @@ export default function RootLayout({
   return (
     <html lang='en' suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <AppProvider>
-          <ThemeProvider attribute='class' defaultTheme='system' enableSystem disableTransitionOnChange>
-            {children}
-            <Toaster />
-          </ThemeProvider>
-          <ReactQueryDevtools initialIsOpen={false} />
-        </AppProvider>
+        <NextIntlClientProvider>
+          <AppProvider>
+            <ThemeProvider attribute='class' defaultTheme='system' enableSystem disableTransitionOnChange>
+              {children}
+              <Toaster />
+            </ThemeProvider>
+            <ReactQueryDevtools initialIsOpen={false} />
+          </AppProvider>
+        </NextIntlClientProvider>
       </body>
     </html>
   )

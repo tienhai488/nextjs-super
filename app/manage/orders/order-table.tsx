@@ -35,7 +35,7 @@ import { useOrderListQuery, useUpdateOrderMutation } from '@/queries/useOrder'
 import TableSkeleton from '@/app/manage/orders/table-skeleton'
 import { toast } from 'sonner'
 import { GuestCreateOrdersResType } from '@/schemaValidations/guest.schema'
-import { useAppContext, useAppStore } from '@/components/app-provider'
+import { useAppStore } from '@/components/app-provider'
 
 export const OrderTableContext = createContext({
   setOrderIdEdit: (value: number | undefined) => {},
