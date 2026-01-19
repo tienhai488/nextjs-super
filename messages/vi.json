@@ -1,5 +1,13 @@
 {
     "HomePage": {
         "title": "Xin chào thế giới!"
+    },
+    "Login": {
+        "title": "Đăng nhập"
+    },
+    "SwitchLanguage": {
+        "title": "Chuyển ngôn ngữ",
+        "en": "Tiếng Anh",
+        "vi": "Tiếng Việt"
     }
 }

@@ -12,6 +12,7 @@ import { generateSocketInstance, handleErrorApi } from '@/lib/utils'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect } from 'react'
 import { useAppStore } from '@/components/app-provider'
+import { useTranslations } from 'next-intl'
 
 export default function LoginForm() {
   const loginMutation = useLoginMutation()
@@ -21,6 +22,7 @@ export default function LoginForm() {
   // const { setRole, setSocket } = useAppContext()
   const setRole = useAppStore((state) => state.setRole)
   const setSocket = useAppStore((state) => state.setSocket)
+  const t = useTranslations('Login')
 
   useEffect(() => {
     if (clearTokens === 'true') {
@@ -55,7 +57,7 @@ export default function LoginForm() {
   return (
     <Card className='mx-auto w-[400px]'>
       <CardHeader>
-        <CardTitle className='text-2xl'>Đăng nhập</CardTitle>
+        <CardTitle className='text-2xl'>{t('title')}</CardTitle>
         <CardDescription>Nhập email và mật khẩu của bạn để đăng nhập vào hệ thống</CardDescription>
       </CardHeader>
       <CardContent>

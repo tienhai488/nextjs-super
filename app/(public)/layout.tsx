@@ -5,6 +5,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import NavItems from '@/app/(public)/nav-items'
 import DarkModeToggle from '@/components/dark-mode-toggle'
 import { DialogDescription, DialogTitle } from '@/components/ui/dialog'
+import { SwitchLanguage } from '@/components/switch-language'
 
 export default function Layout({
   children,
@@ -45,7 +46,8 @@ export default function Layout({
             </nav>
           </SheetContent>
         </Sheet>
-        <div className='ml-auto'>
+        <div className='ml-auto flex items-center gap-4'>
+          <SwitchLanguage />
           <DarkModeToggle />
         </div>
       </header>
