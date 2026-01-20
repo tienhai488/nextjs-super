@@ -8,10 +8,11 @@ import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { GuestLoginBody, GuestLoginBodyType } from '@/schemaValidations/guest.schema'
 import { useAppStore } from '@/components/app-provider'
-import { useParams, useRouter, useSearchParams } from 'next/navigation'
+import { useParams, useSearchParams } from 'next/navigation'
 import { useGuestLoginMutation } from '@/queries/useGuest'
 import { useEffect } from 'react'
 import { generateSocketInstance, handleErrorApi } from '@/lib/utils'
+import { useRouter } from '@/i18n/navigation'
 
 export default function GuestLoginForm() {
   // const { setRole, setSocket } = useAppContext()

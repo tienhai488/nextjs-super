@@ -25,7 +25,7 @@ import { useUploadMediaMutation } from '@/queries/useMedia'
 import { useGetDish, useUpdateDishMutation } from '@/queries/useDish'
 import { toast } from 'sonner'
 import revalidateApiRequest from '@/apiRequests/revalidate'
-import { useRouter } from 'next/navigation'
+import { useRouter } from '@/i18n/navigation'
 
 export default function EditDish({
   id,

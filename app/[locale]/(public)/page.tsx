@@ -1,9 +1,9 @@
 import dishApiRequest from '@/apiRequests/dish'
+import { Link } from '@/i18n/navigation'
 import { formatCurrency } from '@/lib/utils'
 import { DishListResType } from '@/schemaValidations/dish.schema'
 import { getTranslations } from 'next-intl/server'
 import Image from 'next/image'
-import Link from 'next/link'
 
 export default async function Home() {
   let dishList: DishListResType['data'] = []

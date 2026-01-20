@@ -1,8 +1,9 @@
 'use client'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Locale, locales } from '@/config'
+import { usePathname, useRouter } from '@/i18n/navigation'
 import { useLocale, useTranslations } from 'next-intl'
-import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useParams, useSearchParams } from 'next/navigation'
 
 export function SwitchLanguage() {
   const t = useTranslations('SwitchLanguage')

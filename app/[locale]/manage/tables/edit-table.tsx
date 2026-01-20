@@ -11,10 +11,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { UpdateTableBody, UpdateTableBodyType } from '@/schemaValidations/table.schema'
 import { TableStatus, TableStatusValues } from '@/constants/type'
 import { Switch } from '@/components/ui/switch'
-import Link from 'next/link'
 import { useGetTable, useUpdateTableMutation } from '@/queries/useTable'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
+import { Link } from '@/i18n/navigation'
 
 export default function EditTable({
   id,
