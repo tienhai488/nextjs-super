@@ -1,6 +1,7 @@
 {
     "HomePage": {
-        "title": "Hello world!"
+        "title": "Hello world!",
+        "description": "This is a Next.js application with multi-language support using next-intl."
     },
     "Login": {
         "title": "Login"

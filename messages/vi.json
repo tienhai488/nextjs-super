@@ -1,6 +1,7 @@
 {
     "HomePage": {
-        "title": "Xin chào thế giới!"
+        "title": "Xin chào thế giới!",
+        "description": "Đây là một ứng dụng Next.js với hỗ trợ đa ngôn ngữ bằng next-intl."
     },
     "Login": {
         "title": "Đăng nhập"
