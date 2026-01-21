@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { Suspense } from 'react'
 import { Menu, Package2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
@@ -47,7 +48,9 @@ export default function Layout({
           </SheetContent>
         </Sheet>
         <div className='ml-auto flex items-center gap-4'>
-          <SwitchLanguage />
+          <Suspense fallback={null}>
+            <SwitchLanguage />
+          </Suspense>
           <DarkModeToggle />
         </div>
       </header>

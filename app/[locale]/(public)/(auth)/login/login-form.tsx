@@ -9,21 +9,24 @@ import { Input } from '@/components/ui/input'
 import { useLoginMutation } from '@/queries/useAuth'
 import { toast } from 'sonner'
 import { generateSocketInstance, handleErrorApi } from '@/lib/utils'
-import { useSearchParams } from 'next/navigation'
 import { useEffect } from 'react'
 import { useAppStore } from '@/components/app-provider'
 import { useTranslations } from 'next-intl'
 import { useRouter } from '@/i18n/navigation'
 
-export default function LoginForm() {
+export default function LoginForm({ clearTokens }: { clearTokens?: string }) {
   const loginMutation = useLoginMutation()
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const clearTokens = searchParams.get('clearTokens')
   // const { setRole, setSocket } = useAppContext()
   const setRole = useAppStore((state) => state.setRole)
   const setSocket = useAppStore((state) => state.setSocket)
   const t = useTranslations('Login')
+
+  useEffect(() => {
+    if (clearTokens === 'true') {
+      setRole(undefined)
+    }
+  }, [clearTokens, setRole])
 
   useEffect(() => {
     if (clearTokens === 'true') {
