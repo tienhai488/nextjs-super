@@ -9,5 +9,11 @@
         "title": "Switch language",
         "en": "English",
         "vi": "Vietnamese"
+    },
+    "Validation": {
+        "email": "Invalid email",
+        "password_min": "Password must be at least {min} characters",
+        "password_max": "Password must not exceed {max} characters",
+        "required": "This field is required"
     }
 }

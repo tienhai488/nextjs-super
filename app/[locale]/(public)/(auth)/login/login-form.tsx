@@ -1,6 +1,6 @@
 'use client'
 import { Button } from '@/components/ui/button'
-import { LoginBody, LoginBodyType } from '@/schemaValidations/auth.schema'
+import { LoginBody, LoginBodyBase, LoginBodyType } from '@/schemaValidations/auth.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -21,6 +21,9 @@ export default function LoginForm({ clearTokens }: { clearTokens?: string }) {
   const setRole = useAppStore((state) => state.setRole)
   const setSocket = useAppStore((state) => state.setSocket)
   const t = useTranslations('Login')
+  const validateMessages = useTranslations('Validation')
+
+  const formSchema = LoginBodyBase(validateMessages as any)
 
   useEffect(() => {
     if (clearTokens === 'true') {
@@ -35,7 +38,7 @@ export default function LoginForm({ clearTokens }: { clearTokens?: string }) {
   }, [clearTokens, setRole])
 
   const form = useForm<LoginBodyType>({
-    resolver: zodResolver(LoginBody),
+    resolver: zodResolver(formSchema),
     defaultValues: {
       email: '',
       password: ''

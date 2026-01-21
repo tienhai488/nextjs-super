@@ -9,5 +9,11 @@
         "title": "Chuyển ngôn ngữ",
         "en": "Tiếng Anh",
         "vi": "Tiếng Việt"
+    },
+    "Validation": {
+        "email": "Email không hợp lệ",
+        "password_min": "Mật khẩu phải có ít nhất {min} ký tự",
+        "password_max": "Mật khẩu không được quá {max} ký tự",
+        "required": "Trường này là bắt buộc"
     }
 }
