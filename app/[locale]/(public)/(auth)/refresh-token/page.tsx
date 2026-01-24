@@ -1,29 +1,13 @@
-'use client'
+import RefreshTokenHandler from '@/app/[locale]/(public)/(auth)/refresh-token/refresh-token'
+import { Metadata } from 'next'
+import { Suspense } from 'react'
 
-import { useRouter } from '@/i18n/navigation'
-import { checkAndRefreshToken, getRefreshTokenFromLocalStorage } from '@/lib/utils'
-import { useSearchParams } from 'next/navigation'
-import { Suspense, useEffect } from 'react'
-
-function RefreshTokenHandler() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const refreshTokenFromUrl = searchParams.get('refreshToken')
-  const redirectPathname = searchParams.get('redirect')
-
-  useEffect(() => {
-    if (refreshTokenFromUrl && refreshTokenFromUrl === getRefreshTokenFromLocalStorage()) {
-      checkAndRefreshToken({
-        onSuccess: () => {
-          router.push(redirectPathname || '/')
-        }
-      })
-    } else {
-      router.push('/login')
-    }
-  }, [redirectPathname, refreshTokenFromUrl, router])
-
-  return <div>Refresh token...</div>
+export const metadata: Metadata = {
+  title: 'Refresh Token Redirect',
+  description: 'Refresh Token Redirect',
+  robots: {
+    index: false
+  }
 }
 
 export default function RefreshTokenPage() {

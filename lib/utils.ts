@@ -13,6 +13,7 @@ import { format } from 'date-fns'
 import { BookX, CookingPot, HandCoins, Loader, Truck } from 'lucide-react'
 import { io } from 'socket.io-client'
 import slugify from 'slugify'
+import { convert } from 'html-to-text'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -232,4 +233,10 @@ export const extractIdFromSlugUrl = (slugUrl: string): number | null => {
   if (!id) return null
   const parsedId = parseInt(id, 10)
   return isNaN(parsedId) ? null : parsedId
+}
+
+export const htmlToTextWithLimit = (html: string, maxLength: number = 140): string => {
+  return convert(html, {
+    limits: { maxInputLength: maxLength }
+  })
 }
