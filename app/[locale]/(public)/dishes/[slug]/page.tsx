@@ -27,7 +27,8 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
     locale: params.locale,
     namespace: 'DishDetail'
   })
-  const id = extractIdFromSlugUrl(params.slug)
+  const { slug } = await params
+  const id = extractIdFromSlugUrl(slug)
   const data = await dishApiRequest.detail(id!)
   const dish = data?.payload.data
   if (!dish) {

@@ -13,6 +13,7 @@ import { useEffect } from 'react'
 import { useAppStore } from '@/components/app-provider'
 import { useTranslations } from 'next-intl'
 import { useRouter } from '@/i18n/navigation'
+import { LoaderCircle } from 'lucide-react'
 
 export default function LoginForm({ clearTokens }: { clearTokens?: string }) {
   const loginMutation = useLoginMutation()
@@ -100,6 +101,7 @@ export default function LoginForm({ clearTokens }: { clearTokens?: string }) {
                 )}
               />
               <Button type='submit' className='w-full'>
+                {loginMutation.isPending && <LoaderCircle className='w-5 h-5 animate-spin' />}
                 Đăng nhập
               </Button>
               <Button variant='outline' className='w-full' type='button'>
