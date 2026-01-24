@@ -142,7 +142,7 @@ export default function OrderStatics({
               </div>
               <Separator
                 orientation='vertical'
-                className={cn('flex-shrink-0 flex-grow h-auto', {
+                className={cn('shrink-0 flex-grow h-auto', {
                   'bg-muted-foreground': !isEmptyTable
                 })}
               />

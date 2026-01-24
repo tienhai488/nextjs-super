@@ -3,12 +3,14 @@
 import { useAppStore } from '@/components/app-provider'
 import { usePathname, useRouter } from '@/i18n/navigation'
 import { checkAndRefreshToken } from '@/lib/utils'
+import { useLocale } from 'next-intl'
 import { useEffect } from 'react'
 
 const UNAUTHENTICATED_PATHS = ['/login', '/register', '/refresh-token']
 export default function RefreshToken() {
   const pathname = usePathname()
   const router = useRouter()
+  const locale = useLocale()
   // const { socket, disconnectSocket } = useAppContext()
   const socket = useAppStore((state) => state.socket)
   const disconnectSocket = useAppStore((state) => state.disconnectSocket)
@@ -23,7 +25,7 @@ export default function RefreshToken() {
     const onTokenError = () => {
       clearInterval(interval)
       disconnectSocket()
-      window.location.href = '/login'
+      window.location.href = `/${locale}/login`
       // router.push('/login')
     }
 

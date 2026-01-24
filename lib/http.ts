@@ -1,4 +1,4 @@
-import envConfig from '@/config'
+import envConfig, { defaultLocale } from '@/config'
 import { redirect } from '@/i18n/navigation'
 import {
   formatPath,
@@ -8,6 +8,7 @@ import {
   setRefreshTokenToLocalStorage
 } from '@/lib/utils'
 import { LoginResType } from '@/schemaValidations/auth.schema'
+import Cookies from 'js-cookie'
 
 type CustomOptions = Omit<RequestInit, 'method'> & {
   baseUrl?: string | undefined
@@ -104,6 +105,7 @@ const request = async <Response>(
       )
     } else if (res.status === AUTHENTICATION_ERROR_STATUS) {
       if (isClient) {
+        const locale = Cookies.get('NEXT_LOCALE') || defaultLocale
         if (!clientLogoutRequest) {
           clientLogoutRequest = fetch('/api/auth/logout', {
             method: 'POST',
@@ -119,7 +121,7 @@ const request = async <Response>(
           } finally {
             removeTokensFromLocalStorage()
             clientLogoutRequest = null
-            location.href = '/login'
+            location.href = `/${locale}/login`
           }
         }
       } else {
